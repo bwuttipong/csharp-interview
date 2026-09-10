@@ -5,7 +5,6 @@ using Microsoft.Data.Sqlite;
 
 namespace ConsoleApp1;
 
-
 public class Person
 {
     // Field - private, internal storage
@@ -130,5 +129,106 @@ class Program
         insertCommand.Parameters.AddWithValue("@name", "Product A");
         insertCommand.Parameters.AddWithValue("@price", 10.99);
         insertCommand.ExecuteScalar();
+    }
+
+    static string ReverseString(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
+    }
+
+    static IEnumerable<int> FindDuplicates(IEnumerable<int> numbers)
+    {
+        var counts = new Dictionary<int, int>();
+        
+        foreach (var n in numbers)
+        {
+           counts.TryGetValue(n, out int count);
+           counts[n] = count + 1;
+        }
+
+        return counts.Where(kvp => kvp.Value > 1).Select(kvp => kvp.Key);
+    }
+
+    static int FindLargest(int[] numbers)
+    {
+        if (numbers == null || numbers.Length == 0)
+            throw new ArgumentException("Array cannot be null or empty.");
+
+        int max = numbers[0];
+        for (int i = 1; i < numbers.Length; i++)
+        {
+            if (numbers[i] > max)
+                max = numbers[i];
+        }
+        return max;
+    }
+
+    static Dictionary<char, int> CountCharacters(string input)
+    {
+        var counts = new Dictionary<char, int>();
+
+        foreach (var c in input)
+        {
+            counts.TryGetValue(c, out int count);
+            counts[c] = count + 1;
+        }
+
+        return counts;
+    }
+
+    record Person(string Name, int Age);
+
+    static List<Person> GetAdults(List<Person> people)
+    {
+        return people.Where(p => p.Age >= 18).ToList();
+    }
+}
+
+record Product(int Id, string Name, decimal Price);
+
+class ProductRepository
+{
+    private readonly List<Product> _products = new();
+    private int _nextId = 1;
+
+
+    // CREATE
+    public Product CreateProduct()
+    {
+        var product = new Product(_nextId, $"Product {_nextId}", _nextId * 10.0m);
+        _products.Add(product);
+        _nextId++;
+        return product;
+    }
+
+    // READ - all
+    public IEnumerable<Product> GetAllProducts() => _products.AsReadOnly();
+
+    // READ - by id
+    public Product? GetProductById(int id) => _products.FirstOrDefault(p => p.Id == id);
+
+    public bool UpdateProduct(int id, string name, decimal price)
+    {
+        var product = GetProductById(id);
+        if (product == null) return false;
+
+        // Records are immutable - replace with a new instance
+        var index = _products.IndexOf(product);
+        _products[index] = product with { Name = name, Price = price }; 
+        return true;
+    }
+
+    // DELETE
+    public bool DeleteProduct(int id)
+    {
+        var product = GetProductById(id);
+        if (product == null) return false;
+        _products.Remove(product);
+        return true;
     }
 }
