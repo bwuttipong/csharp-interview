@@ -1,4 +1,6 @@
-# C# Developer Interview Prep
+# C# Developer Interview Prep 🎯
+
+> You've got this. Every line you write is proof you're building the skill. One step at a time, and it'll be fine — better than fine, even. Let's get after it. 🚀
 
 ConsoleApp1 — a C# console project covering properties, generics, LINQ, switch expressions, and SQLite.
 
